@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 10 Brain Battle</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#101827;color:#fff;min-height:100vh}
+header{text-align:center;padding:25px 15px;background:#172554;border-bottom:3px solid #38bdf8}
+header h1{margin:0 0 10px;font-size:30px}header p{margin:0;color:#cbd5e1}
+.container{width:92%;max-width:750px;margin:25px auto}
+.panel{background:#1e293b;border:1px solid #334155;padding:20px;border-radius:16px;margin-bottom:18px}
+h2,h3{margin-top:0}.subjects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+button{font-size:16px;font-weight:bold;padding:14px;border:none;border-radius:10px;cursor:pointer;transition:.2s}
+button:focus-visible{outline:3px solid white;outline-offset:3px}
+.subject-btn{color:white;background:#334155;border:1px solid #475569}.subject-btn:hover{background:#475569}
+.primary-btn{background:#38bdf8;color:#082f49}.primary-btn:hover{background:#7dd3fc}
+.secondary-btn{background:#475569;color:white}button:disabled{opacity:.55;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;text-align:center}
+.stat{padding:12px 5px;background:#0f172a;border-radius:10px}.stat strong{display:block;font-size:23px;color:#38bdf8;margin-top:6px}
+.small{font-size:13px;color:#cbd5e1}#question{font-size:21px;line-height:1.5}
+.answers{display:grid;gap:10px;margin-top:18px}.answer-btn{background:#334155;color:white;text-align:left;border:2px solid #475569}
+.answer-btn:hover:not(:disabled){background:#475569}.answer-btn.correct{background:#166534;border-color:#4ade80}.answer-btn.wrong{background:#991b1b;border-color:#f87171}
+.timer-track{height:9px;background:#334155;border-radius:20px;overflow:hidden;margin-top:10px}
+#timerBar{height:100%;width:100%;background:#38bdf8;transition:width 1s linear}
+#feedback{line-height:1.6;min-height:25px}.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}.controls button{flex:1}
+.hidden{display:none!important}footer{text-align:center;padding:25px;color:#94a3b8;font-size:13px}
+@media(max-width:420px){header h1{font-size:25px}.container{width:94%}.panel{padding:15px}#question{font-size:19px}button{padding:12px 9px}}
+</style>
+</head>
+<body>
+<header><h1>🧠 Brain Battle</h1><p>CBSE Class 10 Educational Game</p></header>
+<main class="container">
+<section class="panel">
+<h2>🎮 Choose Your Subject</h2><p class="small">Answer questions, earn points, and level up!</p>
+<div class="subjects">
+<button class="subject-btn" data-subject="Science">🔬 Science</button>
+<button class="subject-btn" data-subject="Maths">📐 Maths</button>
+<button class="subject-btn" data-subject="Social Science">🌍 Social Science</button>
+<button class="subject-btn" data-subject="English">📚 English</button>
+</div></section>
+<section class="panel"><div class="stats">
+<div class="stat"><span class="small">Score</span><strong id="score">0</strong></div>
+<div class="stat"><span class="small">Level</span><strong id="level">1</strong></div>
+<div class="stat"><span class="small">Time</span><strong id="timer">20</strong></div>
+</div></section>
+<section id="game" class="panel">
+<h2 id="gameTitle">Welcome, Champion! 🏆</h2><p id="gameInfo">Choose a subject above to start your first challenge.</p>
+<div id="quizArea" class="hidden"><p class="small" id="questionNumber"></p><h3 id="question"></h3>
+<div class="timer-track"><div id="timerBar"></div></div><div id="answers" class="answers"></div>
+<p id="feedback" aria-live="polite"></p><p id="explanation" class="small"></p>
+<div class="controls"><button id="nextBtn" class="primary-btn" disabled>Next Question →</button><button id="restartBtn" class="secondary-btn">Restart</button></div></div>
+<div id="resultArea" class="hidden"><h2 id="resultTitle">Challenge Complete!</h2><p id="resultMessage"></p>
+<div class="controls"><button id="playAgainBtn" class="primary-btn">Play Again 🔄</button></div></div>
+</section></main><footer>Brain Battle · Learn More, Play More!</footer>
+<script>
+"use strict";
+const questions={
+"Science":[
+{q:"What is the SI unit of electric current?",options:["Volt","Ampere","Ohm","Watt"],answer:1,explanation:"Electric current is measured in amperes (A)."},
+{q:"Which gas is released during photosynthesis?",options:["Nitrogen","Hydrogen","Oxygen","Carbon dioxide"],answer:2,explanation:"Plants release oxygen during photosynthesis."},
+{q:"What is the pH of a neutral solution at 25°C?",options:["1","5","7","14"],answer:2,explanation:"A neutral solution has a pH of 7 at 25°C."},
+{q:"Which lens is used to correct myopia?",options:["Convex","Concave","Plane glass","None of these"],answer:1,explanation:"A concave lens helps correct myopia, or short-sightedness."},
+{q:"Which part of a flower produces pollen?",options:["Stigma","Ovary","Anther","Petal"],answer:2,explanation:"The anther produces pollen grains."},
+{q:"What is the chemical formula of baking soda?",options:["NaCl","NaHCO3","CaCO3","NaOH"],answer:1,explanation:"Baking soda is sodium hydrogen carbonate, NaHCO₃."},
+{q:"Which blood vessels carry blood away from the heart?",options:["Veins","Arteries","Capillaries","Nerves"],answer:1,explanation:"Arteries carry blood away from the heart."}],
+"Maths":[
+{q:"What are the roots of x² − 5x + 6 = 0?",options:["1 and 6","2 and 3","−2 and −3","1 and 5"],answer:1,explanation:"(x − 2)(x − 3) = 0, so x = 2 or x = 3."},
+{q:"What is sin 30°?",options:["1","√3/2","1/2","0"],answer:2,explanation:"sin 30° = 1/2."},
+{q:"Find the distance between (0, 0) and (3, 4).",options:["5","7","12","4"],answer:0,explanation:"Distance = √(3² + 4²) = √25 = 5."},
+{q:"What is the common difference of 3, 7, 11, 15?",options:["3","7","4","11"],answer:2,explanation:"Subtract consecutive terms: 7 − 3 = 4."},
+{q:"What is the probability of getting heads on a fair coin?",options:["0","1/4","1/2","1"],answer:2,explanation:"There is one favourable outcome out of two."},
+{q:"What is the value of √144?",options:["10","11","12","14"],answer:2,explanation:"12 × 12 = 144."},
+{q:"What is the sum of the angles of a triangle?",options:["90°","180°","270°","360°"],answer:1,explanation:"The interior angles of a triangle sum to 180°."}],
+"Social Science":[
+{q:"Which institution makes laws for the whole country in India?",options:["Parliament","Supreme Court","Election Commission","NITI Aayog"],answer:0,explanation:"Parliament is India's national law-making institution."},
+{q:"Which sector includes farming?",options:["Primary","Secondary","Tertiary","None of these"],answer:0,explanation:"Farming uses natural resources, so it belongs to the primary sector."},
+{q:"What does GDP measure?",options:["Only exports","The value of final goods and services produced within a country","Only farm production","Government taxes only"],answer:1,explanation:"GDP measures the value of final goods and services produced within a country during a period."},
+{q:"Which soil is especially associated with cotton cultivation in India?",options:["Laterite soil","Black soil","Mountain soil","Desert soil"],answer:1,explanation:"Black soil retains moisture and is particularly suitable for cotton."},
+{q:"What is an important purpose of power sharing?",options:["End elections","Concentrate all power","Reduce conflict and share authority","Remove courts"],answer:2,explanation:"Power sharing helps reduce conflict and supports democracy."},
+{q:"Which organisation conducts elections to Parliament in India?",options:["Election Commission of India","Supreme Court alone","Reserve Bank of India","Finance Commission"],answer:0,explanation:"The Election Commission of India administers national and state elections."},
+{q:"Which sector mainly provides services?",options:["Primary","Secondary","Tertiary","Agricultural"],answer:2,explanation:"The tertiary sector provides services such as transport, banking, and education."}],
+"English":[
+{q:"Choose the correct reported speech: He said, “I am tired.”",options:["He said that I am tired.","He said that he was tired.","He says he was tired.","He said that he is tiring."],answer:1,explanation:"In standard reported speech, 'am' changes to 'was' and 'I' changes to 'he'."},
+{q:"Choose the correct passive voice: She wrote a letter.",options:["A letter wrote her.","A letter is written by her.","A letter was written by her.","A letter had wrote by her."],answer:2,explanation:"The simple past passive uses was/were + past participle."},
+{q:"Which word is closest in meaning to 'rapid'?",options:["Slow","Quick","Weak","Silent"],answer:1,explanation:"Rapid means fast or quick."},
+{q:"Identify the adjective: The clever student solved it.",options:["Student","Solved","Clever","It"],answer:2,explanation:"'Clever' describes the noun 'student'."},
+{q:"Choose the correct form: If I ___ hard, I will pass.",options:["Studied","Study","Studies","Studying"],answer:1,explanation:"The first conditional uses the present simple in the if-clause."},
+{q:"What is the plural of 'child'?",options:["Childs","Childes","Children","Childrens"],answer:2,explanation:"The plural of child is children."},
+{q:"Choose the correct article: He is ___ honest man.",options:["A","An","The only possible article is the","No article"],answer:1,explanation:"'Honest' begins with a vowel sound, so we use 'an'."}]
+};
+let currentSubject="",currentQuestions=[],questionIndex=0,score=0,secondsLeft=20,timerInterval=null,answered=false,gameFinished=false;
+const $=id=>document.getElementById(id);
+const scoreElement=$("score"),levelElement=$("level"),timerElement=$("timer"),gameTitle=$("gameTitle"),gameInfo=$("gameInfo"),quizArea=$("quizArea"),resultArea=$("resultArea"),questionNumber=$("questionNumber"),questionElement=$("question"),answersElement=$("answers"),feedbackElement=$("feedback"),explanationElement=$("explanation"),timerBar=$("timerBar"),nextButton=$("nextBtn");
+function stopTimer(){if(timerInterval!==null){clearInterval(timerInterval);timerInterval=null;}}
+function shuffleQuestions(list){for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]];}}
+function startGame(subject){
+stopTimer();currentSubject=subject;currentQuestions=questions[subject].slice();shuffleQuestions(currentQuestions);
+questionIndex=0;score=0;answered=false;gameFinished=false;scoreElement.textContent=score;levelElement.textContent=1;
+resultArea.classList.add("hidden");quizArea.classList.remove("hidden");gameTitle.textContent="🏆 "+subject+" Challenge";gameInfo.textContent="Answer correctly to earn 10 points.";showQuestion();
+}
+function showQuestion(){
+stopTimer();if(questionIndex>=currentQuestions.length){finishGame();return;}
+answered=false;const q=currentQuestions[questionIndex];
+questionNumber.textContent="LEVEL "+(questionIndex+1)+" · QUESTION "+(questionIndex+1)+" OF "+currentQuestions.length;
+levelElement.textContent=questionIndex+1;questionElement.textContent=q.q;feedbackElement.textContent="";explanationElement.textContent="";answersElement.replaceChildren();nextButton.disabled=true;
+nextButton.textContent=questionIndex===currentQuestions.length-1?"See Results 🏆":"Next Question →";
+q.options.forEach((option,index)=>{const button=document.createElement("button");button.className="answer-btn";button.textContent=String.fromCharCode(65+index)+". "+option;button.addEventListener("click",()=>checkAnswer(index,button));answersElement.appendChild(button);});
+startTimer();
+}
+function startTimer(){stopTimer();secondsLeft=20;timerElement.textContent=secondsLeft;timerBar.style.width="100%";timerInterval=setInterval(()=>{if(answered||gameFinished){stopTimer();return;}secondsLeft--;timerElement.textContent=secondsLeft;timerBar.style.width=(secondsLeft/20*100)+"%";if(secondsLeft<=0){stopTimer();timeUp();}},1000);}
+function timeUp(){
+if(answered||gameFinished)return;answered=true;const q=currentQuestions[questionIndex];const buttons=answersElement.querySelectorAll("button");
+buttons.forEach((button,index)=>{button.disabled=true;if(index===q.answer)button.classList.add("correct");});
+feedbackElement.textContent="⏰ Time's up!";explanationElement.textContent="Correct answer: "+q.options[q.answer]+". "+q.explanation;nextButton.disabled=false;
+}
+function checkAnswer(selectedIndex,selectedButton){
+if(answered||gameFinished)return;answered=true;stopTimer();const q=currentQuestions[questionIndex];const buttons=answersElement.querySelectorAll("button");buttons.forEach(button=>button.disabled=true);
+if(selectedIndex===q.answer){score+=10;scoreElement.textContent=score;selectedButton.classList.add("correct");feedbackElement.textContent="✅ Correct! +10 points!";}
+else{selectedButton.classList.add("wrong");buttons[q.answer].classList.add("correct");feedbackElement.textContent="❌ Not quite. Keep learning!";}
+explanationElement.textContent=q.explanation;nextButton.disabled=false;
+}
+function nextQuestion(){if(!answered||gameFinished)return;questionIndex++;showQuestion();}
+function finishGame(){
+stopTimer();gameFinished=true;quizArea.classList.add("hidden");resultArea.classList.remove("hidden");gameTitle.textContent="🏆 Challenge Complete!";
+const total=currentQuestions.length,correctAnswers=score/10;let message="";
+if(correctAnswers===total)message="Perfect score! You're a Brain Battle champion! 🥇";
+else if(correctAnswers>=total*.7)message="Excellent work! Keep up the great learning! ⭐";
+else if(correctAnswers>=total*.4)message="Good effort! Practise a little more to improve. 💪";
+else message="Every mistake helps you learn. Try again! 📚";
+$("resultTitle").textContent="Your Score: "+score+" XP";
+$("resultMessage").textContent="Subject: "+currentSubject+". Correct answers: "+correctAnswers+" out of "+total+". "+message;
+timerElement.textContent="0";timerBar.style.width="0%";nextButton.disabled=true;
+}
+function restartGame(){stopTimer();if(currentSubject)startGame(currentSubject);}
+document.querySelectorAll("[data-subject]").forEach(button=>button.addEventListener("click",()=>startGame(button.dataset.subject)));
+nextButton.addEventListener("click",nextQuestion);$("restartBtn").addEventListener("click",restartGame);$("playAgainBtn").addEventListener("click",restartGame);
+stopTimer();
+</script>
+</body>
+</html>
